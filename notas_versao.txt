@@ -1,0 +1,122 @@
+Notas das versões da FME_ISCAS2018
+
+v_2.10 Abril 2, 2018 
+	ERROR: Buffers dos candidatos não está funcionando.
+
+	- Controle Funciona para mais de um ciclo.
+
+	- arithmetic.v: Mudança na quantidade de bits de p, de datawidth+10:0 para datawidth+13:0 no caso de a,c e datawidth+14:0 para b. Não realiza mais a função de shift 6,  processo é realizado pelo clipper.
+	
+	- plus1shfit.v: Adicionado.
+
+	- CLipper entrada de 22, 23 bits.
+
+v_2.9 Março 24, 2018 18:24
+	ERROR: Buffers dos candidatos não está funcionando.
+	
+	- Controle Funciona para mais de um ciclo.
+
+	- SR_horizontal: Agora apresenta 16 bits de armazenamento.
+	
+	- Interpolação Funcionando: adição de um estado intermediário entre o estado final e o estado inicial. Mudanças no contador para zerar os valores durante a execução, não apenas no reset.
+	
+	- Adição de um sinal de controle de reset do finder. Para que os valores das SADs anteriores não fiquem salvas no registrador de best_sad.
+
+	OBS: lambda_r [46] controla a SAD 47, pode mudar o valor desse lambda pra testar a arquitetura.
+	
+v_2.8 Março 23, 2018 19:12
+	- SR_original: Adição. 
+	- SR_integer: Patch.
+
+v_2.7 Março 23, 2018 15:54
+	
+	- SR_integer funcionando (Ta o caralho, funcinando merda nenhuma, precisa inicar o counter, resulta em piramide. E, enable_read começar 1 ciclo antes).
+
+v_2.6 Março 23, 2018 14:53 - Início do ISICAS
+	
+	Serão realizadas alterações nos TB das Inteiras, Horizontais e Originais. Eliminando a necessidade de reescrita dos buffers. Cada célula poderá ser acassada da saída.
+	
+	- SR_horizontal substitui o TB_PH. Controle da saída agora é feito por um contador  que seleciona a coluna de saída. Isso com o enable da arquitetura desligado.
+
+v_2.5 Outubro 16, 2017 15:05 - VERSÃO SUBMETIDA
+
+	FME apresenta apenas 1 enable de entrada (enable_interpolation), enable_search virou u registrador interno.
+ 
+v_2.4 Outubro 16, 2017 14:28
+	
+	- Tem include de tudo que precisa no fme.v
+
+	Search.c: Agora encontra a menor sad, e cria o arquivo best_SAD.txt
+
+	residual.v:Adição do módulo residual, para que a saida da FME seja o residuo entre o candidato e o original.
+
+	lambdar: Apanes 6 lambda_rs como entrada, e agora com 16 bits cada.
+
+	SADs possuem 17 bits.
+
+v_2.3 Outubro 6, 2017 23:59 
+
+	Funcionando com a sisntese, reset sincrono.	
+
+v_2.2 Outubro 6,2017 18:00
+
+	Melhorias em alguns arquivos para diminuição de warnings e erros na síntese.
+
+
+v_2.1 Outubro 5, 2017 20:08
+	
+	Fractional Motion Estimation: Capaz de realizar a interpolação fracionária e a busca, além de armazenar o melhor candidato em um buffer. 
+
+	Fprintf_referência: Atualizado para os valores corretos.
+
+	Interpolation: Funcionando perfeitamente.
+
+	Search: Pequenas alterações no Finder, para ajustar o offset do endereço da SAD.
+
+	Pontos à trabalhar:
+		- Testbench roda apenas uma execução completa.
+		- Criar um unico enable global.
+
+
+v.1.4
+	Search:
+		SAD_tree: agora apresenta um reset_right_sads, que 0 as SADs da direita durante as proximas interações. Este reset é controlado pelo bloco de controle.
+	
+	Interpolation:
+		interpolation_operative.v:O Tranpose Buffer das Inteiras agora está ligado na saída da barreira de resgitradores, para diminuir o consumo de energia. Além disso, ouveram algums mudanças nas nomenclaturas dos blocos pra evitar problemas.
+
+		reg_int.v: Adicionado o botão de reset.
+
+	fme: Nova pasta se preparando para o módulo completo.
+
+v.1.3
+	Search:
+		search.v: Implementado, adicionado um registrador na entrada dos ori, e um TB para fornecer os valores dos pixeils originais.
+		
+		search_tb.v: Implementado e funcionando, para 1 interaçao, precisa de trabalho.
+		
+		search_control.v: fsm utilizada para apenas 1 interaçao, possivel diminuiçao de estados, se adicionar os estados finais nos primeiros estados.
+
+		SAD_tree_tb.v: O testbench agora calcula dois conjuntos de sad. Primeiramente as SADs das PH e depois as das PVPOs. Ambas estao corretas quando comparadas com o software de referencia search.c.
+		Adicionado 
+	
+	search.c: Agora está gerando corretamente o arquivo SADs.txt, e a ordem de escrita fora dos mapas de sads.
+
+v.1.2
+	search.c: Agora calcula o valor de todas as 48 SADs, e gera um arquivo .txt com seus valores FORA DE ordem.
+	best_sads_comparison.v: Compara o valor das 5 melhores sads e apresenta na saida o resultado junto com o endereço da sad.
+	search_control.v e search_operative.v implementados, porem sem testebench.
+	accumulator.v: Agora inicia o valor do registrador como sendo lambda_r + in, assim economizando um ciclo de relógio e fazendo com o que a search seja capaz de realizar a busca na mesma velocidade que novas entradas chegam.
+	sad_tree_tb.v: foi alterado para que as mudanças em accumulator.v ficassem visíveis.
+	
+
+v.1.1
+	fprintf:referencia: está com todos os valores padronizados, gerados pelo mac.
+	search.c: Agora calcula o valor de 6 SADs (21 à 26).
+
+	Interpolation: Verilog completo e funcionando, aguardando simulação conjunta.
+
+	Search: 
+		- SAD.v teve um registrador de saída adicionado, para evitar o chaveamento intenso durante o cálculo da sad. Agora a saída só é alterada no final do calculo.
+		- SAD_tree.v foi simulada para 6 SADs (21 à 26), e seus valores foram condizentes com os apresentados pelo search.c. Já está pronta para uma simulação de busca completa.
+		- Finder.v foi simulado utilizando valores aleatórios e mostrou resultados promissores. Já está pronto para uma simulação da busca completa.
